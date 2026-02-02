@@ -17,15 +17,12 @@ body {
   background: linear-gradient(135deg, #2e0066, #4b0082, #6a0dad);
   color: white;
   font-family: Arial, sans-serif;
-
   display: flex;
   justify-content: center;
   align-items: flex-start;
-
   padding: 30px 16px;
 }
 
-/* background glow */
 .background-gradient {
   position: fixed;
   inset: 0;
@@ -35,14 +32,12 @@ body {
   pointer-events: none;
 }
 
-/* wrapper */
 .content {
   max-width: 1100px;
   width: 100%;
   z-index: 1;
 }
 
-/* header */
 .header {
   text-align: center;
   margin-bottom: 30px;
@@ -54,7 +49,6 @@ body {
   border-radius: 50%;
   border: 5px solid #ffd700;
   object-fit: cover;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   margin-bottom: 14px;
 }
 
@@ -70,7 +64,6 @@ body {
   opacity: 0.9;
 }
 
-/* main card */
 .card {
   background: rgba(30,10,70,0.45);
   backdrop-filter: blur(14px);
@@ -78,13 +71,11 @@ body {
   padding: 24px;
   border: 1px solid rgba(255,215,0,0.18);
   box-shadow: 0 18px 40px rgba(0,0,0,0.45);
-
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 30px;
 }
 
-/* inputs */
 .input-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -95,7 +86,6 @@ body {
 .input-field label {
   display: block;
   margin-bottom: 6px;
-  font-size: 0.9rem;
 }
 
 input, select {
@@ -109,18 +99,11 @@ input, select {
   outline: none;
 }
 
-input:focus, select:focus {
-  border-color: #ffd700;
-  box-shadow: 0 0 10px rgba(255,215,0,0.4);
-}
-
-/* result */
 .result {
   background: rgba(0,0,0,0.25);
   border-radius: 18px;
   padding: 22px;
   border: 1px solid rgba(255,215,0,0.2);
-  height: fit-content;
 }
 
 .result-header {
@@ -131,36 +114,25 @@ input:focus, select:focus {
   font-size: 1.2rem;
 }
 
-.result-row {
+.result-row, .total-row {
   display: flex;
   justify-content: space-between;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
 .total-row {
-  display: flex;
-  justify-content: space-between;
-  padding-top: 16px;
-  margin-top: 12px;
   border-top: 2px solid rgba(255,215,0,0.3);
   font-size: 1.3rem;
   font-weight: bold;
   color: #ffd700;
 }
 
-/* mobile */
 @media (max-width: 768px) {
   .card {
     grid-template-columns: 1fr;
   }
-
   .input-row {
     grid-template-columns: 1fr;
-  }
-
-  .title {
-    font-size: 2rem;
   }
 }
 </style>
@@ -174,28 +146,28 @@ input:focus, select:focus {
 
   <div class="header">
     <img class="rings-image"
-      src="https://images.pexels.com/photos/2219195/pexels-photo-2219195.jpeg"
-      alt="Gold Rings">
+      src="https://images.pexels.com/photos/2219195/pexels-photo-2219195.jpeg">
     <h1 class="title">🪙 Gold Price Calculation</h1>
     <p class="subtitle">Instant gold value estimation</p>
   </div>
 
   <div class="card">
 
-    <!-- LEFT SIDE INPUTS -->
+    <!-- INPUTS -->
     <div>
       <div class="input-row">
         <div class="input-field">
           <label>Weight (grams)</label>
-          <input type="number" value="10">
+          <input type="number" id="weight" value="10">
         </div>
+
         <div class="input-field">
           <label>Purity</label>
-          <select>
-            <option>22K (91.6%)</option>
-            <option>18K (75%)</option>
-            <option>14K (58.5%)</option>
-            <option>24K (100%)</option>
+          <select id="purity">
+            <option value="0.916">22K (91.6%)</option>
+            <option value="0.75">18K (75%)</option>
+            <option value="0.585">14K (58.5%)</option>
+            <option value="1">24K (100%)</option>
           </select>
         </div>
       </div>
@@ -203,42 +175,71 @@ input:focus, select:focus {
       <div class="input-row">
         <div class="input-field">
           <label>Rate per Gram (₹)</label>
-          <input type="number" value="6000">
+          <input type="number" id="rate" value="6000">
         </div>
+
         <div class="input-field">
           <label>Making Charges (%)</label>
-          <input type="number" value="10">
+          <input type="number" id="making" value="10">
         </div>
       </div>
     </div>
 
-    <!-- RIGHT SIDE RESULT -->
+    <!-- RESULT -->
     <div class="result">
       <div class="result-header"> Estimation Result </div>
 
       <div class="result-row">
         <span>🪙 Base Price</span>
-        <span>₹54,960</span>
+        <span id="basePrice">₹0</span>
       </div>
 
       <div class="result-row">
         <span>⚙️ Making Charges</span>
-        <span>₹5,496</span>
+        <span id="makingPrice">₹0</span>
       </div>
 
       <div class="result-row">
         <span>🧾 GST (3%)</span>
-        <span>₹1,814</span>
+        <span id="gstPrice">₹0</span>
       </div>
 
       <div class="total-row">
         <span>Total</span>
-        <span>₹62,270</span>
+        <span id="totalPrice">₹0</span>
       </div>
     </div>
 
   </div>
-
 </div>
+
+<!-- JAVASCRIPT -->
+<script>
+function calculateGold() {
+  const weight = +document.getElementById("weight").value;
+  const purity = +document.getElementById("purity").value;
+  const rate = +document.getElementById("rate").value;
+  const making = +document.getElementById("making").value;
+
+  const base = weight * rate * purity;
+  const makingCharge = base * making / 100;
+  const gst = (base + makingCharge) * 0.03;
+  const total = base + makingCharge + gst;
+
+  document.getElementById("basePrice").innerText = "₹" + base.toFixed(0);
+  document.getElementById("makingPrice").innerText = "₹" + makingCharge.toFixed(0);
+  document.getElementById("gstPrice").innerText = "₹" + gst.toFixed(0);
+  document.getElementById("totalPrice").innerText = "₹" + total.toFixed(0);
+}
+
+document.querySelectorAll("input, select")
+  .forEach(el => el.addEventListener("input", calculateGold));
+
+calculateGold();
+</script>
+
 </body>
 </html>
+
+
+ 
