@@ -254,7 +254,7 @@ input, select {
 <script>
 const inputs = document.querySelectorAll('input, select');
 function formatRupees(amount) {
-  return "₹" + amount.toLocalString("en-IN");
+  return "₹" + amount.toLocaleString("en-IN");
 }
 
 function calculate() {
